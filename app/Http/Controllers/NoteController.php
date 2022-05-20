@@ -72,7 +72,11 @@ class NoteController extends Controller
      */
     public function update(Request $request, Note $note)
     {
-        //
+        //Update
+        $note->update($request->all());
+
+        //Redirect message
+        return Inertia::render('Notes/Show', compact('note'))->with('success', 'Note updated successfully.');
     }
 
     /**
