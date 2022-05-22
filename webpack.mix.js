@@ -20,6 +20,13 @@ mix.js('resources/js/app.js', 'public/js').vue()
         '@': 'resources/js',
     });
 
+    mix.webpackConfig({
+        devServer: {
+            host: '0.0.0.0',
+            port: 8080,
+        },
+    })
+
 if (mix.inProduction()) {
     mix.version();
 }
