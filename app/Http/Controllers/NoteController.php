@@ -13,10 +13,16 @@ class NoteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         return Inertia::render('Notes/Index', [
-            'notes' => Note::latest()->get(),
+            'notes' => Note::orderBy('id', 'DESC')
+            ->where(function ($query) use ($request) {
+                if ($request->has('q')) {
+                    $query->where('title', 'LIKE', '%' . $request->q . '%');
+                }
+            })
+            ->get(),
         ]);
     }
 
@@ -27,7 +33,7 @@ class NoteController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Notes/Create');
     }
 
     /**
@@ -38,7 +44,26 @@ class NoteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //validate inertia
+        $request->validate([
+            'title' => 'required',
+            'body' => 'required',
+        ], [
+            'title.required' => 'El titulo es requerido.',
+            'body.required' => 'El contenido es requerido.',
+        ], [
+            'title' => 'Titulo',
+            'body' => 'Contenido',
+        ]);
+
+        //create note
+        Note::create($request->all());
+
+        #Return
+        return redirect()->route('notes.index')->with([
+            'success' => true,
+            'message' => 'La nota se ha creado correctamente.',
+        ]);
     }
 
     /**
@@ -72,6 +97,22 @@ class NoteController extends Controller
      */
     public function update(Request $request, Note $note)
     {
+        //validate inertia
+        $request->validate([
+            'title' => 'required',
+            'body' => 'required',
+        ], [
+            'title.required' => 'El titulo es requerido.',
+            'body.required' => 'El contenido es requerido.',
+        ], [
+            'title' => 'Titulo',
+            'body' => 'Contenido',
+        ]);
+
+        // Clear errors inertia 
+        $request->session()->forget('errors');
+        
+
         //Update
         $note->update($request->all());
 
@@ -87,6 +128,11 @@ class NoteController extends Controller
      */
     public function destroy(Note $note)
     {
-        //
+        $note->delete();
+
+        return redirect()->route('notes.index')->with([
+            'success' => true,
+            'message' => 'Note deleted successfully.',
+        ]);
     }
 }

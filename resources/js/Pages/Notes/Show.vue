@@ -1,14 +1,3 @@
-<script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import SecondaryButton from '@/Jetstream/SecondaryButton.vue';
-import WarningButton from '@/JetStream/WarningButton.vue';
-defineProps({
-    note: Object,
-    success: String,
-});
-
-</script>
-
 <template>
     <AppLayout title="Dashboard">
         <template #header>
@@ -50,10 +39,15 @@ defineProps({
                                     </SecondaryButton>
                                 </span>
 
-                                <span>
+                                <span class="mr-2">
                                     <WarningButton :href="route('notes.edit', note.id)">
                                         Edit
                                     </WarningButton>
+                                </span>
+                                <span>
+                                    <inertia-link @click.prevent="destroy(note.id)" class="text-red-900 hover:text-white border border-red-800 hover:bg-red-900 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-red-600 dark:text-red-400 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-800">
+                                            Eliminar
+                                        </inertia-link>
                                 </span>
                             </span>
 
@@ -64,3 +58,23 @@ defineProps({
         </div>
     </AppLayout>
 </template>
+
+<script setup>
+import AppLayout from '@/Layouts/AppLayout.vue';
+import { Inertia } from '@inertiajs/inertia';
+import SecondaryButton from '@/Jetstream/SecondaryButton.vue';
+import WarningButton from '@/JetStream/WarningButton.vue';
+defineProps({
+    note: Object,
+    success: String,
+});
+
+// create method destroy
+const destroy = (id) => {
+    // delete note
+    if(confirm('Seguro que desea eliminar la nota?')) {
+        Inertia.delete('/notes/' + id);
+    }
+};
+
+</script>

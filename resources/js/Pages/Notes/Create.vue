@@ -11,30 +11,16 @@
                 <div class="md:grid md:grid-cols-3 md:gap-6">
                     <div class="md:col-span-1">
                         <div class="px4 sm:px0">
-                            <h3 class="text-lg text-gray-900">Edit an note</h3>
-                            <p class="text-sm text-gray-600">Si editar no podrás volver al estado anterior.</p>
+                            <h3 class="text-lg text-gray-900">Create a note</h3>
+                            <p class="text-sm text-gray-600">Crear una nueva note</p>
                         </div>
                     </div>
                     <div class="md:col-span-2 mt-5 md:mt-0">
-                        <span class="mt-3 py-5 border-t-2 block">
-                            <span class="mr-2">
+                        <span class="mr-2">
                                 <SecondaryButton :href="route('notes.index')">
                                     Back
                                 </SecondaryButton>
                             </span>
-
-                            <span class="mr-2">
-                                <WarningButton :href="route('notes.show', note.id)">
-                                    Show
-                                </WarningButton>
-                            </span>
-                            <span>
-                                <inertia-link @click.prevent="destroy(note.id)"
-                                    class="text-red-900 hover:text-white border border-red-800 hover:bg-red-900 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-red-600 dark:text-red-400 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-800">
-                                    Eliminar
-                                </inertia-link>
-                            </span>
-                        </span>
                         <div class="shadow bg-white md:rounded-md p-4">
                             <form @submit.prevent="submit">
                                 <div class="flex flex-wrap -mx-3 mb-6">
@@ -90,30 +76,22 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { reactive } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 import SecondaryButton from '@/Jetstream/SecondaryButton.vue';
-import WarningButton from '@/JetStream/WarningButton.vue';
 
 export default {
     components: {
         AppLayout,
-        SecondaryButton,
-        WarningButton
+        SecondaryButton
     },
     props: {
-        note: {
-            type: Object,
-            required: true,
-        },
         errors: {
             type: Object,
             default: () => ({}),
         },
     },
-    setup(props) {
-        
-        //form reactive data
+    setup() {
         const form = reactive({
-            title: props.note.title,
-            body: props.note.body,
+            title: '',
+            body: '',
             processing: false,
             progress: null,
             errors: {
@@ -122,7 +100,6 @@ export default {
             },
         });
 
-        //Method: submit
         const submit = () => {
             form.processing = true
             form.progress = {
@@ -140,23 +117,13 @@ export default {
             }, 100);
 
             //Http request
-            Inertia.put('/notes/' + props.note.id, form);
+            Inertia.post('/notes', form);
+
         }
 
-        //Method: destroy
-        const destroy = (id) => {
-            // delete note
-            if (confirm('Seguro que desea eliminar la nota?')) {
-                Inertia.delete('/notes/' + id);
-            }
-        };
 
-        //Return data
-        return {
-            form,
-            submit,
-            destroy,
-        };
+
+        return { form, submit }
     }
 }
 
